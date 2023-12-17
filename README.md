@@ -382,3 +382,67 @@ docker-compose up todo_server
 ```
 
 Bu komanda faqatgina `todo_server` xizmatini ishga tushiradi. Bu usul bilan siz o'zingizga kerakli bo'lgan xizmatlarni tanlash va ularni ishga tushirish uchun komandalarni yozishingiz mumkin.
+
+## Docker-ni Ubuntu operatsion tizimiga o'rnatish
+
+Docker-ni Ubuntu operatsion tizimiga o'rnatish uchun, quyidagi qadamlarni amalga oshirishingiz mumkin:
+
+1. **`curl` yordamida Docker-ni olish**:
+   Quyidagi komanda orqali `curl` yordamida `get-docker.sh` skriptini yuklab olishingiz mumkin:
+
+   ```bash
+   curl -fsSL https://get.docker.com -o get-docker.sh
+   ```
+
+   Bu komanda sizga `get-docker.sh` skriptini yuklab olish imkonini beradi.
+
+2. **Docker-ni o'rnatish**:
+   `get-docker.sh` skriptini bajarish va o'rnatish uchun quyidagi komandalarni ishga tushirishingiz mumkin:
+
+   ```bash
+   sudo sh get-docker.sh
+   ```
+
+   Bu komanda skriptni `sudo` bilan ishga tushiradi. Skript `get-docker.sh` Docker-ni o'rnatadi va sozlashlarni olib boradi.
+
+3. **Tekshirib ko'rish**
+  `docker --version` komandasi orqali, o'rnatilgan Docker versiyasini tekshirishingiz mumkin.
+
+```bash
+sudo systemctl start docker
+```
+
+Bu komanda, Ubuntu operatsion tizimida Docker xizmatini ishga tushirish uchun ishlatiladi. `systemctl` komandasi tizimdagi xizmatlarni boshqarish uchun ishlatiladi va `start docker` buyrug'i Docker xizmatini ishga tushiradi.
+
+```bash
+sudo systemctl enable docker
+```
+
+Bu komanda Ubuntu operatsion tizimida Docker xizmatini avtomatik ravishda ishga tushirish va to'g'rilash uchun ishlatiladi. Bu buyruq, tizimdagi boshlang'ich tizim yuklashida Docker xizmatini avtomatik ravishda boshlanish va tizimni qayta yuklashda ishga tushirish uchun foydalaniladi.
+
+```bash
+sudo systemctl status docker
+```
+
+Bu komanda Ubuntu operatsion tizimida Docker xizmatining hozirgi holatini tekshirish uchun ishlatiladi. Bu komanda sizga Docker xizmatining faol yoki faqatdagi holatini ko'rsatadi.
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+Bu komanda Ubuntu operatsion tizimida joriy foydalanuvchini (hozirgi foydalanuvchi) Docker guruhiga qo'shish uchun ishlatiladi. Bu buyruq foydalanuvchining Docker komandalari va xizmatlariga murojaat qilishiga ruxsat beradi.
+
+- `sudo`: Super foydalanuvchi (administrator) huquqiga ega bo'lish uchun.
+- `usermod`: Foydalanuvchi kiritish, tahrirlash yoki tizim guruhlari bilan ishlash uchun ishlatiladi.
+- `-aG docker`: Foydalanuvchi guruhiga (`docker`) qo'shishga yo'l qo'yadi. `-a` buyrug'i guruh a'zoligiga (`-G`) qo'shishni bildiradi.
+- `$USER`: O'zgaruvchi, joriy terminalda kirilgan foydalanuvchi nomi bilan almashtiriladi. Bu avtomatik ravishda o'zingizning foydalanuvchi nomingizga o'zgartiriladi.
+
+Siz bu komandani bajarib, joriy foydalanuvchini Docker guruhiga qo'shib, uning Docker komandalari va xizmatlaridan foydalanishiga ruxsat berishingiz mumkin. Bu o'zgarishlar kechiktirishdan so'ng siz ko'rish uchun Terminalni yoki Command Prompt dasturini qayta boshlashiz kerak bo'ladi.
+
+```bash
+newgrp docker
+```
+
+Bu komanda Linux tizimida guruh o'zgartirish uchun ishlatiladi. Guruh o'zgartirish sizga yangi guruhda yaratilgan foydalanuvchining imkoniyatlaridan foydalanish imkonini beradi.
+
+`newgrp` buyrug'i yangi guruhga o'tishga ruxsat beradi, bu esa komandani bajargandan so'ng, hozirgi terminal oynasida yaratilgan barcha yangiliklarni o'z ichiga oladi. Guruh o'zgartirishdan so'ng foydalanuvchi yangi guruhning a'zosi bo'lib qoladi.
