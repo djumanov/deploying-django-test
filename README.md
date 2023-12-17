@@ -130,3 +130,132 @@ Bu fayl `.env` faylini namunaviy ko'rinishi sifatida ishlaydi. Foydalanuvchilar 
 
 Yodda tuting, `.gitignore` faylida ham bu `.env` faylini qo'shib bo'lishi kerak, shunda maxfiy ma'lumotlar remote repositoryga yuklanmasligi ta'minlanadi.
 
+### **requirements.txt** 
+
+Bu fayl, loyiha ishga tushirilish uchun kerak bo'lgan Python paketlarini ro'yxat qilish uchun ishlatiladi. Faylning maqsadi, loyiha ishga tushirilganda, Python interpreterining kerakli paketlarni avtomatik ravishda o'rnatishini ta'minlashdir.
+
+djangoni o'rnatish
+
+```bash
+pip install django==5.0
+```
+
+djangorestframeworkni o'rnatish
+
+```bash
+pip install djangorestframework==3.14.0
+```
+
+gunicornni o'rnatish
+
+```bash
+pip install gunicorn==21.2.0
+```
+
+O'rnatilgan barcha paketlarni requirements.txt faylga yozish
+
+```bash
+pip freeze > requirements.txt
+```
+
+Bu yerda:
+
+- `django==5.0`: Django frameworkning ma'lum bir versiyasi. `==` belgisi orqali aniqlangan versiya ko'rinishi bo'lib, `5.0` - bu esa ma'lum bir versiya.
+- `djangorestframework==3.14.0`: Django Rest Framework paketi va uning ma'lum bir versiyasi.
+- `gunicorn==21.2.0`: Gunicorn serverining ma'lum bir versiyasi.
+
+Bu paketlar loyihada qo'llaniladigan kerakli paketlardir. `requirements.txt` fayli bu paketlarni loyiha yuklab olish uchun `pip` yordamida o'rnatishga yordam beradi. Misol uchun, quyidagi ko'rinishda buyruqni bajaring:
+
+```bash
+pip install -r requirements.txt
+```
+
+Bu buyruq avtomatik ravishda barcha `requirements.txt` faylida ko'rsatilgan paketlarni o'rnatadi.
+
+### Dockerfile
+
+Bu `Dockerfile` ko'rinishi konteyner yaratish uchun kerakli operatsion tizimni (Alpine) asosida Python 3.10-ni ishga tushiradi va loyihadagi kerakli dasturlarni yuklab olish uchun foydalaniladi.
+
+```Dockerfile
+FROM python:3.10-alpine
+
+RUN pip install --upgrade pip
+
+COPY ./requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY ./todo /app
+
+WORKDIR /app
+
+COPY ./entrypoint.sh /
+ENTRYPOINT ["sh", "/entrypoint.sh"]
+```
+
+Bu `Dockerfile` fayli, bir Docker konteynerini yaratish uchun berilgan yo'l, dasturlarni o'rnatish va ishga tushirish uchun kerakli buyruqlarni o'z ichiga oladi.
+
+1. **FROM python:3.10-alpine**: Bu qismimiz Docker konteynerini qanday asoslashni aytadi. `python:3.10-alpine` asosiy Python 3.10-ni ishlatadi va Alpine Linux operatsion tizimida yaratiladi. Alpine Linux keng tarqalgan va yengil, ammo o'lchamlari kichik.
+
+2. **RUN pip install --upgrade pip**: Konteyner ishga tushirilganda, bu buyruq `pip`ni yangilaydi, agar talab qilinadigan yangi versiya mavjud bo'lsa.
+
+3. **COPY ./requirements.txt .**: Loyiha folderdagi `requirements.txt` faylini konteynerga ko'chirib oladi. Bu faylda loyihada kerakli Python paketlarining ro'yxati joylashgan.
+
+4. **RUN pip install -r requirements.txt**: Konteyner ichidagi `requirements.txt` fayli orqali Python paketlarini o'rnatadi. `pip install -r` buyrug'i fayl ichidagi barcha paketlarni o'rnatadi.
+
+5. **COPY ./todo /app**: Loyiha katalogidagi `todo` papkasini konteynerga ko'chirib oladi. Bu qism, loyiha kodlarini (Django ilovasi va boshqa fayllar) `app` papkasiga ko'chiradi.
+
+6. **WORKDIR /app**: Konteynerda ishga tushirilganda ish qilish uchun ish folderini (`/app`) sozlash. Barcha keyingi buyruqlar bu katalog ichida bajariladi.
+
+7. **COPY ./entrypoint.sh /**: `entrypoint.sh` skriptini konteynerga ko'chiradi. Bu skript konteyner ishga tushirilganda avtomatik ravishda ishga tushiriladi.
+
+8. **ENTRYPOINT ["sh", "/entrypoint.sh"]**: Konteyner ishga tushirilganda `entrypoint.sh` skriptini ishga tushiradi. Bu skript konteynerning boshlanish jarayonida ishga tushiriladi.
+
+Bu `Dockerfile` asosiy qadamlarni o'z ichiga oladi va loyiha ishga tushirilganda kerakli dasturlarni, konfiguratsiyalarni yuklab, o'rnatib, konteyner ishga tushirilishi uchun tayyor bo'lishini ta'minlaydi.
+
+### **docker-compose.yml**
+
+`docker-compose.yml` fayli, Docker konteynerlarini birlashtirib, ishga tushirish va ularga konfiguratsiya berish uchun foydalaniladi. Bu fayl, bir nechta konteynerlarni bitta loyiha ichida ishga tushirish, ularning interfeyslarini sozlash, ular orasidagi aloqani amalga oshirish va boshqa sozlamalarni belgilash imkonini beradi.
+
+```yaml
+version: '3.7'
+
+services:
+  todo_server:
+    volumes:
+    - ./todo:/app
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    build:
+      context: .
+    depends_on:
+      - db
+
+  db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=dbname
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=dbpass
+```
+
+- `version`: Fayl formatining versiyasini ko'rsatadi.
+- `services`: Bu blokda, konteyner xizmatlarini (services) belgilaymiz.
+- `todo_server` va `db`: Xizmat nomlari, har birining xususiyatlari ko'rsatiladi.
+  - `image`: Konteyner yaratish uchun kerakli rasmdagi ismni belgilaydi (bu rasmlar ko'nguljon tasvirlangan konteyner yaratish imkoniyatini ta'minlashda foydalaniladi).
+  - `ports`: Konteyner va hostning portlarini bog'lash uchun ishlatiladi.
+  - `volumes`: Fayl ko'chirish uchun kerakli direktoriyalarni belgilaydi.
+  - `environment`: Konteynerning muhit o'zgaruvchanlarini o'rnating.
+  - `depends_on`: Xizmatning boshqa xizmatlarga bog'liqligini ko'rsatadi.
+
+"Docker Compose" faylni ishga tushirish uchun, Terminal (yoki Command Prompt) dasturida loyihangiz katalogiga o'tib, quyidagi buyruqni ishga tushirishingiz mumkin:
+
+```bash
+docker-compose up -d
+```
+
+- **`docker-compose`**: Docker Compose dasturini boshlash.
+- **`up`**: Barcha xizmatlarni ishga tushiradi va ularga bog'liq konteynerlarni yaratadi yoki ishga tushiradi.
+- **`-d`**: Konteynerlarni fonda ishga tushirish (detach mode), bu xizmatlar fonda ishlaydi va terminalni bloklamaydi.
+
