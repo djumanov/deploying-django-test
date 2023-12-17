@@ -52,8 +52,6 @@ deploying-django-test/
 ├── docker-compose.yml
 ```
 
-## Fayl Strukturi
-
 - **todo/**: Asosiy proyekt kodlari uchun papka.
   - **api/**: Todo-app funksiyalari va loyiha kodlari.
     - **migrations/**: Django o'zgartirishlari uchun migratsiya fayllari.
