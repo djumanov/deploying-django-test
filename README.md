@@ -101,7 +101,9 @@ gunicorn core.wsgi:application --bind 0.0.0.0:8000
 
 3. **Gunicorn server**: Ushbu skript `0.0.0.0:8000` portida Gunicorn serverini ishga tushiradi. Real muhitda, nazorat, loglar va qo'llashga ko'maklash uchun boshqacha parametrlarni ham ko'rsatishingiz mumkin.
 
-### **.env.example** ushbu fayl `.env` faylini namunaviy ko'rinishi sifatida ishlaydi va maxfiy ma'lumotlarni o'z ichiga olmaydi.
+### **.env.example** 
+
+ushbu fayl `.env` faylini namunaviy ko'rinishi sifatida ishlaydi va maxfiy ma'lumotlarni o'z ichiga olmaydi.
 
 ```plaintext
 # Django sozlamalari
