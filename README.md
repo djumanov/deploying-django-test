@@ -225,6 +225,7 @@ services:
   todo_server:
     volumes:
     - ./todo:/app
+    - ./static:/static
     env_file:
       - .env
     ports:
@@ -240,6 +241,9 @@ services:
       - POSTGRES_DB=dbname
       - POSTGRES_USER=dbuser
       - POSTGRES_PASSWORD=dbpass
+
+volumes:
+    static:
 ```
 
 - `version`: Fayl formatining versiyasini ko'rsatadi.
@@ -260,4 +264,108 @@ docker-compose up -d
 - **`docker-compose`**: Docker Compose dasturini boshlash.
 - **`up`**: Barcha xizmatlarni ishga tushiradi va ularga bog'liq konteynerlarni yaratadi yoki ishga tushiradi.
 - **`-d`**: Konteynerlarni fonda ishga tushirish (detach mode), bu xizmatlar fonda ishlaydi va terminalni bloklamaydi.
+
+### **nginx/default.conf**
+
+Bu `nginx/default.conf` fayli, Nginx serverining konfiguratsiya fayli hisoblanadi. Bu faylda Django ilovasini ishga tushirgan Docker konteyneri bilan bog'langan joylarni ko'rsatish uchun kerakli sozlamalar joylashadi.
+
+Quyidagi qism misol bo'yicha konfiguratsiyani ta'minlaydi:
+
+```plaintext
+upstream django {
+    server todo_server:8000;
+}
+```
+
+`upstream` direktivasi, `django` nomli serveri (`todo_server:8000`) aylanadi. Bu nom asosida Nginx, `todo_server` nomli Django ilovasi bilan bog'langan xizmatning portini (`8000`) aniqlaydi.
+
+```plaintext
+server {
+    listen 80;
+
+    location / {
+        proxy_pass http://django;
+    }
+
+    location /static/ {
+        alias /static/;
+    }
+}
+```
+
+- `server` bloki Nginx serverining konfiguratsiyasini boshlaydi.
+  - `listen 80;` Nginx serverining 80-portini eshitishni anglatadi, bu oddiy HTTP so'rovlarini qabul qilish uchun ishlatiladi.
+  - `location /` direktivasi HTTP so'rovlarini qayerga yo'nlash kerakligini aytadi.
+    - `proxy_pass http://django;` HTTP so'rovlarini `django` serveriga yo'nlash uchun ishlatiladi, `upstream` direktivasida aylanib borilgan `todo_server:8000` ga o'xshaydi.
+  - `location /static/` direktivasi esa statik fayllarni qayerda topish kerakligini aniqlaydi.
+    - `alias /static/;` Statik fayllarni serverning `/static/` yo'lininga joylashtirish uchun ishlatiladi.
+
+Bu konfiguratsiya fayli, Nginx serverini ishga tushirishda Django ilovasi bilan bog'liq so'rovlar uchun yo'l yo'riqnomasi ta'minlaydi va statik fayllarni `todo_server` konteyneriga qanday yuborishini ko'rsatadi.
+
+### **nginx/Dockerfile**
+
+Bu `nginx/Dockerfile` fayli, Nginx serverining Docker konteynerini tuzish uchun foydalaniladi.  Bu faylda Nginx ning Docker obrazini (`nginx:1.19.0-alpine`) o'z ichiga oladi va kerakli konfiguratsiya faylini (`default.conf`) Nginx serverining konfiguratsiya papkasiga ko'chiradi.
+
+```docker
+FROM nginx:1.19.0-alpine
+
+COPY ./default.conf /etc/nginx/conf.d/default.conf
+```
+
+- `FROM nginx:1.19.0-alpine`: Bu qator, sizning Nginx serverining yangi Docker obrazini `nginx:1.19.0-alpine` asosida yaratish uchun boshlang'ich nuqtani belgilaydi. `alpine` versiyasi esa, kichik hajmli va oddiy operatsion tizimini (Alpine Linux) ko'rsatadi.
+  
+- `COPY ./default.conf /etc/nginx/conf.d/default.conf`: Bu qator esa, `default.conf` faylini Docker obraziga ko'chirib, uni Nginx serverining konfiguratsiya papkasiga (`/etc/nginx/conf.d/`) joylashadi.
+
+Bu Dockerfile, Nginx serverining konfiguratsiya faylini `nginx:1.19.0-alpine` asosida yaratilgan Docker obraziga joylash uchun ishlatiladi. `default.conf` fayli Nginx serverining sozlamalarini konfiguratsiya qiladi.
+
+### nginx ni docker compose ga qo'shish
+
+```yml
+version: '3.7'
+
+services:
+  db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=dbname
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=dbpass
+
+  todo_server:
+    volumes:
+    - ./todo:/app
+    - ./static:/static
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    build:
+      context: .
+    depends_on:
+      - db
+
+  nginx:
+    build: ./nginx
+    volumes:
+      - ./static:/static
+    ports:
+      - "80:80"
+    depends_on:
+      - todo_server  
+
+volumes:
+    static:
+```
+
+- nginx server
+
+  - `build: ./nginx`: Bu qism `nginx` xizmatining Dockerfile'ini topish uchun qaysi papkada (`./nginx`) qurish kerakligini bildiradi.
+
+  - `volumes: - ./static:/static`: `nginx` xizmatiga statik fayllarni joylashtirish uchun direktivani belgilaydi. Bu joylashtirilgan papka host kompyuterda (`./static`) va konteynerda (`/static`) bir xil yo'lga ega bo'ladi.
+
+  - `ports: - "80:80"`: Ushbu qism Nginx serverining portlarini bog'lash uchun ishlatiladi. `80` portini host kompyuterda (`80`) va konteynerda (`80`) bog'laydi.
+
+  - `depends_on: - todo_server`: Nginx xizmati boshqa xizmatlarga (`todo_server`) bog'lanadi. Bu, `todo_server` xizmatining ishga tushirilishidan oldin Nginx serverining ishga tushirilishini ta'minlaydi.
+
+Bu `docker-compose.yml` faylda `nginx` xizmati qo'shildi. Bu xizmat Nginx serverining konteynerini ishga tushirish va statik fayllarni (`./static`) yo'llash uchun kerakli sozlamalarni o'z ichiga oladi.
 
