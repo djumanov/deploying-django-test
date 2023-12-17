@@ -365,3 +365,20 @@ volumes:
 
 Bu `docker-compose.yml` faylda `nginx` xizmati qo'shildi. Bu xizmat Nginx serverining konteynerini ishga tushirish va statik fayllarni (`./static`) yo'llash uchun kerakli sozlamalarni o'z ichiga oladi.
 
+### run docker-compose.yml
+
+Docker Compose faylini ishga tushirish uchun, quyidagi komandani Terminal yoki Command Prompt dasturida ishga tushiring:
+
+```bash
+docker-compose up -d
+```
+
+Bu komanda sizning loyihangizdagi barcha xizmatlarni (`db`, `todo_server`, `nginx`) birlashtirib, ularning ishga tushirilishini boshlaydi. Ular o'rnasiga bog'liq Docker obrazlarini yaratadi, xizmatlar o'rnasiga konteynerlar yaratadi va ularni ishga tushiradi.
+
+Agar siz `docker-compose.yml` fayl ichidagi xizmatlardan faqatgina ma'lum birini ishga tushirishni istasangiz, undan foydalanishingiz mumkin. Masalan:
+
+```bash
+docker-compose up todo_server
+```
+
+Bu komanda faqatgina `todo_server` xizmatini ishga tushiradi. Bu usul bilan siz o'zingizga kerakli bo'lgan xizmatlarni tanlash va ularni ishga tushirish uchun komandalarni yozishingiz mumkin.
