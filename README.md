@@ -269,22 +269,16 @@ docker-compose up -d
 
 Bu `nginx/default.conf` fayli, Nginx serverining konfiguratsiya fayli hisoblanadi. Bu faylda Django ilovasini ishga tushirgan Docker konteyneri bilan bog'langan joylarni ko'rsatish uchun kerakli sozlamalar joylashadi.
 
-Quyidagi qism misol bo'yicha konfiguratsiyani ta'minlaydi:
-
 ```plaintext
 upstream django {
     server todo_server:8000;
 }
-```
 
-`upstream` direktivasi, `django` nomli serveri (`todo_server:8000`) aylanadi. Bu nom asosida Nginx, `todo_server` nomli Django ilovasi bilan bog'langan xizmatning portini (`8000`) aniqlaydi.
-
-```plaintext
 server {
     listen 80;
 
     location / {
-        proxy_pass http://django;
+        proxy_pass: http://django;
     }
 
     location /static/ {
@@ -292,6 +286,8 @@ server {
     }
 }
 ```
+
+- `upstream` direktivasi, `django` nomli serveri (`todo_server:8000`) aylanadi. Bu nom asosida Nginx, `todo_server` nomli Django ilovasi bilan bog'langan xizmatning portini (`8000`) aniqlaydi.
 
 - `server` bloki Nginx serverining konfiguratsiyasini boshlaydi.
   - `listen 80;` Nginx serverining 80-portini eshitishni anglatadi, bu oddiy HTTP so'rovlarini qabul qilish uchun ishlatiladi.
