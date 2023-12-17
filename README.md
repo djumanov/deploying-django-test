@@ -446,3 +446,83 @@ newgrp docker
 Bu komanda Linux tizimida guruh o'zgartirish uchun ishlatiladi. Guruh o'zgartirish sizga yangi guruhda yaratilgan foydalanuvchining imkoniyatlaridan foydalanish imkonini beradi.
 
 `newgrp` buyrug'i yangi guruhga o'tishga ruxsat beradi, bu esa komandani bajargandan so'ng, hozirgi terminal oynasida yaratilgan barcha yangiliklarni o'z ichiga oladi. Guruh o'zgartirishdan so'ng foydalanuvchi yangi guruhning a'zosi bo'lib qoladi.
+
+### 1. PostgreSQLni o'rnatish:
+
+#### macOS uchun:
+
+1. **Homebrew orqali o'rnatish (moslashuvchan)**:
+   
+   ```bash
+   brew install postgresql
+   ```
+
+2. **PostgreSQLni ishga tushirish**:
+   
+   ```bash
+   brew services start postgresql
+   ```
+
+#### Ubuntu uchun:
+
+1. **Paket boshqaruvchisi orqali o'rnatish**:
+
+   ```bash
+   sudo apt update
+   sudo apt install postgresql postgresql-contrib
+   ```
+
+2. **PostgreSQL xizmatini ishga tushirish**:
+
+   ```bash
+   sudo service postgresql start
+   ```
+
+### 2. Foydalanuvchi yaratish va ma'lumotlar bazasini o'rnatish:
+
+1. **PostgreSQLga kirish**:
+   
+   ```bash
+   sudo -u postgres psql
+   ```
+
+2. **Foydalanuvchi yaratish**:
+
+   ```sql
+   CREATE USER foydalanuvchi NOMI WITH PASSWORD 'parol';
+   ```
+
+   (`foydalanuvchi NOMI` o'zgartiring, `parol`ni esa foydalanuvchi uchun kerakli parol bilan almashtiring)
+
+3. **Ma'lumotlar bazasini yaratish va foydalanuvchiga ruxsat bering**:
+
+   ```sql
+   CREATE DATABASE bazaning_ismi OWNER foydalanuvchi NOMI;
+   ```
+
+   (`bazaning_ismi` nomini va `foydalanuvchi NOMI` ni o'zgartiring)
+
+4. **Kirishni qo'llash**:
+   
+   ```sql
+   \q
+   ```
+
+### 3. Konfiguratsiyani o'rnatish:
+
+PostgreSQLga ulanish sozlamalarini o'zgartirish uchun `settings.py` faylini o'zgartiring:
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'bazaning_ismi',
+        'USER': 'foydalanuvchi NOMI',
+        'PASSWORD': 'parol',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
+```
+
+Bu buyruqlar orqali siz PostgreSQL o'rnatish va sozlash jarayonini amalga oshirishingiz mumkin. Keyin esa Django ilovangizni ushbu ma'lumotlar bazasi bilan ulash uchun sozlashlarni o'zgartirishingiz kerak.
