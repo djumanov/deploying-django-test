@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    volumes:
+      - ./static:/var/lib/postgresql/data
+    expose:
+      - 5432
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=DB_NAME
+      - POSTGRES_USER=DB_USER
+      - POSTGRES_PASSWORD=DB_PASSWORD
+
+  todo_server:
+    volumes:
+    - ./todo:/app
+    - ./static:/static
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    build:
+      context: .
+    depends_on:
+      - db
+
+  nginx:
+    build: ./nginx
+    volumes:
+      - ./static:/static
+    ports:
+      - "80:80"
+    depends_on:
+      - todo_server  
+
+volumes:
+    static:
