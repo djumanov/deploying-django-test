@@ -78,7 +78,7 @@ deploying-django-test/
 
 Bu strukturada **todo/** papkasi asosiy proyekt kodlarini (API va asosiy sozlamalar) o'z ichiga oladi, **nginx/** papkasi esa Nginx server sozlamalari uchun ishlatiladi. Barcha fayllar va papkalar loyihani boshqarish va sozlashda yordam beradi.
 
-**entrypoint.sh**
+### **entrypoint.sh**
 
 Bu skript Django ilovasini ishga tushirish uchun kerak bo'lgan oddiy `entrypoint.sh` ning bir misolini taqdim etadi. Bu skript `manage.py` yordamida migratsiyalarni bajaradi, to'plangan static fayllarni olib keladi va Gunicorn serverini ishga tushiradi.
 
@@ -101,7 +101,7 @@ gunicorn core.wsgi:application --bind 0.0.0.0:8000
 
 3. **Gunicorn server**: Ushbu skript `0.0.0.0:8000` portida Gunicorn serverini ishga tushiradi. Real muhitda, nazorat, loglar va qo'llashga ko'maklash uchun boshqacha parametrlarni ham ko'rsatishingiz mumkin.
 
-**.env.example** ushbu fayl `.env` faylini namunaviy ko'rinishi sifatida ishlaydi va maxfiy ma'lumotlarni o'z ichiga olmaydi.
+### **.env.example** ushbu fayl `.env` faylini namunaviy ko'rinishi sifatida ishlaydi va maxfiy ma'lumotlarni o'z ichiga olmaydi.
 
 ```plaintext
 # Django sozlamalari
